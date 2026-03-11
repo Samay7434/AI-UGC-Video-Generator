@@ -1,11 +1,12 @@
 fastapi
-uvicorn
+uvicorn[standard]
 moviepy
 requests
 python-multipart
 pydantic
-openai-whisper
+python-dotenv
 torch
 torchvision
 pillow
+openai-whisper
 git+https://github.com/openai/CLIP.git
