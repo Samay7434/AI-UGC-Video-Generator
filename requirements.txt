@@ -8,5 +8,14 @@ python-dotenv
 torch
 torchvision
 pillow
+edge-tts
+os
+re
+math
+random
+CLIP
+streamlit
+json
+asynico
 openai-whisper
 git+https://github.com/openai/CLIP.git

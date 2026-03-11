@@ -1,7 +1,6 @@
 import requests
 import random
 import os
-import os
 
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
 
