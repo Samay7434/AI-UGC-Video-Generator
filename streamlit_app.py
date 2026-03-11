@@ -134,18 +134,45 @@ if st.session_state.last_payload:
 
     if st.button("🔁 Regenerate Video"):
 
-        with st.spinner("Generating new variation..."):
+        status_box = st.empty()
 
-            response = requests.post(
-                API_URL,
-                json=st.session_state.last_payload
-            )
+        response = requests.post(
+            API_URL,
+            json=st.session_state.last_payload,
+            stream=True
+        )
 
-            video_path = response.json()["video_file"]
+        video_path = None
+
+        try:
+
+            for line in response.iter_lines():
+
+                if line:
+
+                    data = line.decode("utf-8")
+                    data = eval(data)
+
+                    status_box.info(data["status"])
+
+                    if data["status"] == "complete":
+                        video_path = data["video_file"]
+
+                    if data["status"] == "error":
+                        st.error(data["message"])
+                        break
+
+        except requests.exceptions.ChunkedEncodingError:
+
+            st.error("Connection interrupted during regeneration.")
+
+        if video_path:
+
+            st.success("New Video Generated!")
 
             st.session_state.video_history.insert(0, video_path)
 
-        st.rerun()
+            st.rerun()
 
 # ---------- VIDEO HISTORY PANEL ----------
 
