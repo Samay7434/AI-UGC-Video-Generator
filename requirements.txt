@@ -1,21 +1,13 @@
 fastapi
-uvicorn[standard]
+uvicorn
 moviepy
 requests
 python-multipart
 pydantic
 python-dotenv
-torch
-torchvision
-pillow
 edge-tts
-os
-re
-math
-random
-CLIP
-streamlit
-json
-asynico
+pillow
 openai-whisper
+torch --index-url https://download.pytorch.org/whl/cpu
+torchvision --index-url https://download.pytorch.org/whl/cpu
 git+https://github.com/openai/CLIP.git
