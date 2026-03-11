@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import json
 
 API_URL = "http://127.0.0.1:8000/generate"
 
@@ -107,7 +108,7 @@ if st.button("🚀 Generate Video"):
             if line:
 
                 data = line.decode("utf-8")
-                data = eval(data)
+                data = json.loads(data)
 
                 status_box.info(data["status"])
 
