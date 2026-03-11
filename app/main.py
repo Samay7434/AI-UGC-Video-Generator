@@ -35,6 +35,10 @@
 
 from fastapi import FastAPI
 from app.routes import video
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = FastAPI()
 

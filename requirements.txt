@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+moviepy
+requests
+python-multipart
+pydantic
+openai-whisper
+torch
+torchvision
+pillow
+git+https://github.com/openai/CLIP.git
