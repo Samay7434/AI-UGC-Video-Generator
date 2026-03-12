@@ -14,6 +14,7 @@ from app.services.scene_filter_service import filter_best_videos
 
 router = APIRouter()
 
+
 class VideoRequest(BaseModel):
     product: str
     tone: str
@@ -22,12 +23,13 @@ class VideoRequest(BaseModel):
 
 
 @router.post("/generate")
-
 async def generate_video(request: VideoRequest):
 
     async def event_stream():
 
         try:
+
+            # ---------------- SCRIPT ----------------
 
             yield json.dumps({"status": "Generating script..."}) + "\n"
 
@@ -39,18 +41,35 @@ async def generate_video(request: VideoRequest):
 
             parsed = parse_script(script)
 
+            # Send hook to frontend
+            yield json.dumps({
+                "type": "hook",
+                "data": parsed["hook"]
+            }) + "\n"
+
+            # ---------------- VOICE ----------------
+
             yield json.dumps({"status": "Generating voice..."}) + "\n"
 
             clean_text = f"{parsed['hook']} {parsed['body']} {parsed['cta']}"
+
             audio_file = await generate_voice(clean_text)
+
+            # ---------------- SCENE SEARCH ----------------
 
             yield json.dumps({"status": "Searching scenes..."}) + "\n"
 
-            queries = generate_scene_queries(parsed, request.product, request.tone)
+            queries = generate_scene_queries(
+                parsed,
+                request.product,
+                request.tone
+            )
 
             hook_videos = safe_search("", queries["hook"])
             body_videos = safe_search("", queries["body"])
             cta_videos = safe_search("", queries["cta"])
+
+            # ---------------- DOWNLOAD CLIPS ----------------
 
             yield json.dumps({"status": "Downloading clips..."}) + "\n"
 
@@ -75,6 +94,14 @@ async def generate_video(request: VideoRequest):
 
                 clip_paths.append(clip_path)
 
+                # Send preview clip to frontend
+                yield json.dumps({
+                    "type": "scene",
+                    "data": clip_path
+                }) + "\n"
+
+            # ---------------- VIDEO RENDER ----------------
+
             yield json.dumps({"status": "Rendering video..."}) + "\n"
 
             video_file = create_video(
@@ -83,6 +110,8 @@ async def generate_video(request: VideoRequest):
                 scene_paths=clip_paths,
                 style=request.style
             )
+
+            # ---------------- COMPLETE ----------------
 
             yield json.dumps({
                 "status": "complete",
@@ -96,4 +125,7 @@ async def generate_video(request: VideoRequest):
                 "message": str(e)
             }) + "\n"
 
-    return StreamingResponse(event_stream(), media_type="text/plain")
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/plain"
+    )

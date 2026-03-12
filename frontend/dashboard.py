@@ -123,11 +123,9 @@ with library_col:
     if st.session_state.history:
 
         for video in reversed(st.session_state.history):
-
             st.video(video)
 
     else:
-
         st.write("No videos generated yet.")
 
 # ---------------- GENERATION PROCESS ----------------
@@ -154,11 +152,11 @@ if generate:
     video_file = None
 
     step_progress = {
-        "Generating script...":20,
-        "Generating voice...":40,
-        "Searching scenes...":60,
-        "Downloading clips...":80,
-        "Rendering video...":95
+        "Generating script...": 20,
+        "Generating voice...": 40,
+        "Searching scenes...": 60,
+        "Downloading clips...": 80,
+        "Rendering video...": 95
     }
 
     for line in response.iter_lines():
@@ -167,7 +165,21 @@ if generate:
 
             data = json.loads(line.decode())
 
-            status = data["status"]
+            # ---------------- HANDLE HOOK + SCENE EVENTS ----------------
+
+            if "type" in data:
+
+                if data["type"] == "hook":
+                    hook_box.success(data["data"])
+
+                elif data["type"] == "scene":
+                    scene_preview.video(data["data"])
+
+                continue
+
+            # ---------------- HANDLE STATUS EVENTS ----------------
+
+            status = data.get("status")
 
             if status == "complete":
 
@@ -190,7 +202,6 @@ if generate:
                 status_log.info(status)
 
                 if status in step_progress:
-
                     progress_bar.progress(step_progress[status])
 
     # ---------------- SHOW FINAL VIDEO ----------------
@@ -208,7 +219,6 @@ if generate:
         st.video(saved_path)
 
         with open(saved_path, "rb") as f:
-
             st.download_button(
                 "⬇ Download Video",
                 f,
