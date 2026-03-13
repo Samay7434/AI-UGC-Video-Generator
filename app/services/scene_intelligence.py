@@ -1,6 +1,5 @@
 import re
 
-
 def extract_keywords(text):
 
     text = text.lower()
@@ -40,11 +39,14 @@ def generate_scene_queries(parsed, product, tone):
 
     tone_keywords = tone_map.get(tone.lower(), tone)
 
-    hook_query = f"{product} inspiration creative lifestyle"
+    # HOOK
+    hook_query = f"{product} aesthetic lifestyle inspiration"
 
+    # BODY
     body_query = f"{product} {tone_keywords}"
 
-    cta_query = f"{product} success achievement happy professional"
+    # CTA (product-focused instead of generic)
+    cta_query = f"{product} product close up holding {product} happy customer"
 
     return {
         "hook": hook_query,

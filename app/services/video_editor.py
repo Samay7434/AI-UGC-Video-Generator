@@ -23,28 +23,29 @@ def split_into_lines(text, max_words=6):
 from moviepy.video.fx.Loop import Loop
 
 def create_scene(video_path, duration, start_time, word_timestamps, WIDTH, HEIGHT, subtitle_size, is_hook=False):
+
     clip = VideoFileClip(video_path)
 
-    # LOOP if video shorter than needed
+    # loop if too short
     if clip.duration < duration:
         clip = clip.with_effects([Loop(duration=duration)])
 
-    # Trim exactly
     clip = clip.subclipped(0, duration)
 
-    # resize first
+    # ---------- SAFE RESIZE ----------
     clip = clip.resized(height=HEIGHT)
 
-    # safe crop only if width is large enough
+    # ---------- SAFE CENTER CROP ----------
     if clip.w > WIDTH:
-        clip = clip.cropped(x_center=clip.w / 2, width=WIDTH)
+        clip = clip.cropped(x_center=clip.w/2, width=WIDTH)
 
-    clip = clip.with_position("center") 
+    clip = clip.with_position("center")
 
+    # ---------- REDUCE ZOOM ----------
     if is_hook:
-        clip = clip.resized(lambda t: 1 + 0.08 * t)  # stronger zoom
+        clip = clip.resized(lambda t: 1 + 0.04 * t)
     else:
-        clip = clip.resized(lambda t: 1 + 0.02 * t)
+        clip = clip.resized(lambda t: 1 + 0.01 * t)
 
     subtitles = []
 
@@ -74,6 +75,7 @@ def create_scene(video_path, duration, start_time, word_timestamps, WIDTH, HEIGH
         subtitles.append(txt)
 
     scene = CompositeVideoClip([clip] + subtitles, size=(WIDTH, HEIGHT))
+
     return scene
 
 # MAIN VIDEO CREATOR
