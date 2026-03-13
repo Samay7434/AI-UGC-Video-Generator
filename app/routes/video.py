@@ -148,7 +148,7 @@ router = APIRouter()
 
 os.makedirs("cache/audio", exist_ok=True)
 os.makedirs("cache/video", exist_ok=True)
-
+os.makedirs("cache/clips", exist_ok=True)
 
 class VideoRequest(BaseModel):
     product: str

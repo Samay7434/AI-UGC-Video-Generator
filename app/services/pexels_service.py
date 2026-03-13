@@ -2,8 +2,7 @@ import requests
 import random
 import os
 
-PEXELS_API_KEY = "F28kOYh4qjDrl3UcByQGM9CrjGOhw8VyXkGV93zKwQQOeaQ9QmGwD5l4"
-
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
 
 def build_query(product, tone):
 
