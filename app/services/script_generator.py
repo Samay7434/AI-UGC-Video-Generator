@@ -1,41 +1,114 @@
-import requests
+# import requests
+# import math
+
+# def generate_block(product, tone, words_per_block):
+#     prompt = f"""
+#     You are writing a UGC video ad.
+
+#     STRICT RULES:
+#     - Spoken dialogue only.
+#     - Around {words_per_block} words.
+#     - Keep HOOK, BODY, CTA format.
+#     - No explanations.
+
+#     Product: {product}
+#     Tone: {tone}
+
+#     Format:
+
+#     HOOK:
+#     ...
+
+#     BODY:
+#     ...
+
+#     CTA:
+#     ...
+#     """
+
+#     response = requests.post(
+#         "http://localhost:11434/api/generate",
+#         json={
+#             "model": "llama3",
+#             "prompt": prompt,
+#             "stream": False
+#         }
+#     )
+
+#     return response.json()["response"]
+
+
+# def generate_script(product, tone, duration):
+
+#     target_words = int(duration * 3.5)
+#     blocks = math.ceil(target_words / 80)
+
+#     final_hook = ""
+#     final_body = ""
+#     final_cta = ""
+
+#     for i in range(blocks):
+#         block = generate_block(product, tone, int(target_words / blocks))
+
+#         if "HOOK:" in block and not final_hook:
+#             final_hook = block.split("HOOK:")[1].split("BODY:")[0].strip()
+
+#         if "BODY:" in block:
+#             body_part = block.split("BODY:")[1].split("CTA:")[0].strip()
+#             final_body += " " + body_part
+
+#         if "CTA:" in block:
+#             final_cta = block.split("CTA:")[1].strip()
+
+#     return f"""
+# HOOK:
+# {final_hook}
+
+# BODY:
+# {final_body.strip()}
+
+# CTA:
+# {final_cta}
+# """
+
+from groq import Groq
 import math
+import os
+
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def generate_block(product, tone, words_per_block):
+
     prompt = f"""
-    You are writing a UGC video ad.
+You are writing a UGC video ad.
 
-    STRICT RULES:
-    - Spoken dialogue only.
-    - Around {words_per_block} words.
-    - Keep HOOK, BODY, CTA format.
-    - No explanations.
+STRICT RULES:
+- Spoken dialogue only
+- Around {words_per_block} words
+- Keep HOOK, BODY, CTA format
+- No explanations
 
-    Product: {product}
-    Tone: {tone}
+Product: {product}
+Tone: {tone}
 
-    Format:
+Format:
 
-    HOOK:
-    ...
+HOOK:
+...
 
-    BODY:
-    ...
+BODY:
+...
 
-    CTA:
-    ...
-    """
+CTA:
+...
+"""
 
-    response = requests.post(
-        "http://localhost:11434/api/generate",
-        json={
-            "model": "llama3",
-            "prompt": prompt,
-            "stream": False
-        }
+    response = client.chat.completions.create(
+        model="llama3-8b-8192",
+        messages=[{"role": "user", "content": prompt}]
     )
 
-    return response.json()["response"]
+    return response.choices[0].message.content
 
 
 def generate_script(product, tone, duration):
@@ -48,6 +121,7 @@ def generate_script(product, tone, duration):
     final_cta = ""
 
     for i in range(blocks):
+
         block = generate_block(product, tone, int(target_words / blocks))
 
         if "HOOK:" in block and not final_hook:
