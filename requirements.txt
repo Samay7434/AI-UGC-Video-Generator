@@ -7,6 +7,7 @@ pydantic
 python-dotenv
 edge-tts
 pillow
+groq
 openai-whisper
 torch --index-url https://download.pytorch.org/whl/cpu
 torchvision --index-url https://download.pytorch.org/whl/cpu
